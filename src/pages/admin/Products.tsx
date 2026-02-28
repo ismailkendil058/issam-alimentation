@@ -51,6 +51,7 @@ const AdminProducts = () => {
     setName(""); setPurchasePrice(""); setSellingPrice(""); setBarcode("");
     setCategoryId(""); setQuantityType("unit"); setStock(""); setSizes([]);
     setEditing(null);
+    setShowScanner(false);
   };
 
   const openEdit = (p: any) => {
@@ -92,7 +93,6 @@ const AdminProducts = () => {
       const { error } = await supabase.from("products").update(productData).eq("id", editing.id);
       if (error) { toast.error("Update failed"); return; }
       productId = editing.id;
-      // Delete old sizes
       await supabase.from("product_sizes").delete().eq("product_id", productId);
     } else {
       const { data, error } = await supabase.from("products").insert(productData).select().single();
@@ -100,7 +100,6 @@ const AdminProducts = () => {
       productId = data.id;
     }
 
-    // Insert sizes if ML type
     if (quantityType === "ml" && sizes.length > 0) {
       const sizeData = sizes
         .filter((s) => s.size_ml)
@@ -117,7 +116,6 @@ const AdminProducts = () => {
     }
 
     setShowDialog(false);
-    setShowScanner(false);
     resetForm();
     fetchProducts();
     toast.success(editing ? "Product updated" : "Product added");
@@ -138,11 +136,16 @@ const AdminProducts = () => {
     setSizes(newSizes);
   };
 
+  const handleBarcodeScan = (scannedBarcode: string) => {
+    setBarcode(scannedBarcode);
+    setShowScanner(false);
+  };
+
   return (
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Products</h2>
-        <Button onClick={() => { resetForm(); setShowDialog(true); setShowScanner(true); }} size="sm" className="rounded-xl gap-1">
+        <Button onClick={() => { resetForm(); setShowDialog(true); }} size="sm" className="rounded-xl gap-1">
           <Plus className="w-4 h-4" /> Add
         </Button>
       </div>
@@ -166,10 +169,10 @@ const AdminProducts = () => {
                   </div>
                 </div>
                 <div className="flex gap-1 ml-2">
-                  <button onClick={() => openEdit(p)} className="p-2 hover:bg-secondary rounded-xl">
+                  <button onClick={() => openEdit(p)} className="p-2 hover:bg-secondary rounded-xl" title="Edit">
                     <Pencil className="w-4 h-4" />
                   </button>
-                  <button onClick={() => handleDelete(p.id)} className="p-2 hover:bg-secondary rounded-xl text-destructive">
+                  <button onClick={() => handleDelete(p.id)} className="p-2 hover:bg-secondary rounded-xl text-destructive" title="Delete">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -180,92 +183,98 @@ const AdminProducts = () => {
         {products.length === 0 && <p className="text-center text-muted-foreground text-sm mt-8">No products yet</p>}
       </div>
 
-      <Dialog open={showDialog} onOpenChange={(open) => { setShowDialog(open); if (!open) setShowScanner(false); }}>
+      <Dialog open={showDialog} onOpenChange={(open) => { if (!open) resetForm(); }}>
         <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto rounded-2xl">
           <DialogHeader>
             <DialogTitle>{editing ? "Edit Product" : "Add Product"}</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3">
-            <Input placeholder="Product name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 rounded-xl" />
-
-            <div className="grid grid-cols-2 gap-2">
-              <Input placeholder="Purchase price (Dz)" type="number" value={purchasePrice} onChange={(e) => setPurchasePrice(e.target.value)} className="h-11 rounded-xl" />
-              <Input placeholder="Selling price (Dz)" type="number" value={sellingPrice} onChange={(e) => setSellingPrice(e.target.value)} className="h-11 rounded-xl" />
-            </div>
-
-            <div className="flex gap-2">
-              <Input 
-                placeholder="Barcode (optional)" 
-                value={barcode} 
-                onChange={(e) => setBarcode(e.target.value)} 
-                className="h-11 rounded-xl flex-1" 
-              />
-              <Button 
-                type="button" 
-                variant="outline" 
-                onClick={() => setShowScanner(true)} 
-                className="h-11 rounded-xl px-3"
-                aria-label="Scan barcode"
-              >
-                <ScanBarcode className="w-5 h-5" />
-              </Button>
-            </div>
-
-            <Select value={categoryId} onValueChange={setCategoryId}>
-              <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Category" /></SelectTrigger>
-              <SelectContent>
-                {categories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select value={quantityType} onValueChange={setQuantityType}>
-              <SelectTrigger className="h-11 rounded-xl"><SelectValue /></SelectTrigger>
-              <SelectContent>
-                <SelectItem value="unit">Unit-based</SelectItem>
-                <SelectItem value="ml">ML-based (sizes)</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {quantityType === "unit" && (
-              <Input placeholder="Stock quantity" type="number" value={stock} onChange={(e) => setStock(e.target.value)} className="h-11 rounded-xl" />
-            )}
-
-            {quantityType === "ml" && (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium">Sizes</p>
-                  <Button type="button" variant="outline" size="sm" onClick={addSize} className="rounded-xl gap-1">
-                    <Plus className="w-3 h-3" /> Size
-                  </Button>
-                </div>
-                {sizes.map((s, i) => (
-                  <div key={i} className="grid grid-cols-5 gap-1 items-center">
-                    <Input placeholder="ml" value={s.size_ml} onChange={(e) => updateSize(i, "size_ml", e.target.value)} className="h-9 rounded-lg text-xs" />
-                    <Input placeholder="Buy" value={s.purchase_price} onChange={(e) => updateSize(i, "purchase_price", e.target.value)} className="h-9 rounded-lg text-xs" />
-                    <Input placeholder="Sell" value={s.selling_price} onChange={(e) => updateSize(i, "selling_price", e.target.value)} className="h-9 rounded-lg text-xs" />
-                    <Input placeholder="Stock" value={s.stock} onChange={(e) => updateSize(i, "stock", e.target.value)} className="h-9 rounded-lg text-xs" />
-                    <button onClick={() => removeSize(i)} className="p-1 text-destructive"><X className="w-4 h-4" /></button>
-                  </div>
-                ))}
+          
+          {showScanner ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <p className="font-medium">Scan Barcode</p>
+                <button onClick={() => setShowScanner(false)} className="p-2 hover:bg-secondary rounded-xl" title="Close scanner">
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-            )}
+              <BarcodeScanner 
+                onScan={handleBarcodeScan}
+                onClose={() => setShowScanner(false)}
+              />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <Input placeholder="Product name" value={name} onChange={(e) => setName(e.target.value)} className="h-11 rounded-xl" />
 
-            <Button onClick={handleSave} className="w-full h-11 rounded-xl">{editing ? "Update" : "Add Product"}</Button>
-          </div>
+              <div className="grid grid-cols-2 gap-2">
+                <Input placeholder="Purchase price (Dz)" type="number" value={purchasePrice} onChange={(e) => setPurchasePrice(e.target.value)} className="h-11 rounded-xl" />
+                <Input placeholder="Selling price (Dz)" type="number" value={sellingPrice} onChange={(e) => setSellingPrice(e.target.value)} className="h-11 rounded-xl" />
+              </div>
+
+              <div className="flex gap-2">
+                <Input 
+                  placeholder="Barcode (optional)" 
+                  value={barcode} 
+                  onChange={(e) => setBarcode(e.target.value)} 
+                  className="h-11 rounded-xl flex-1" 
+                />
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setShowScanner(true)} 
+                  className="h-11 rounded-xl px-3"
+                  aria-label="Scan barcode"
+                >
+                  <ScanBarcode className="w-5 h-5" />
+                </Button>
+              </div>
+
+              <Select value={categoryId} onValueChange={setCategoryId}>
+                <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Category" /></SelectTrigger>
+                <SelectContent>
+                  {categories.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              <Select value={quantityType} onValueChange={setQuantityType}>
+                <SelectTrigger className="h-11 rounded-xl"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="unit">Unit-based</SelectItem>
+                  <SelectItem value="ml">ML-based (sizes)</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {quantityType === "unit" && (
+                <Input placeholder="Stock quantity" type="number" value={stock} onChange={(e) => setStock(e.target.value)} className="h-11 rounded-xl" />
+              )}
+
+              {quantityType === "ml" && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">Sizes</p>
+                    <Button type="button" variant="outline" size="sm" onClick={addSize} className="rounded-xl gap-1">
+                      <Plus className="w-3 h-3" /> Size
+                    </Button>
+                  </div>
+                  {sizes.map((s, i) => (
+                    <div key={i} className="grid grid-cols-5 gap-1 items-center">
+                      <Input placeholder="ml" value={s.size_ml} onChange={(e) => updateSize(i, "size_ml", e.target.value)} className="h-9 rounded-lg text-xs" />
+                      <Input placeholder="Buy" value={s.purchase_price} onChange={(e) => updateSize(i, "purchase_price", e.target.value)} className="h-9 rounded-lg text-xs" />
+                      <Input placeholder="Sell" value={s.selling_price} onChange={(e) => updateSize(i, "selling_price", e.target.value)} className="h-9 rounded-lg text-xs" />
+                      <Input placeholder="Stock" value={s.stock} onChange={(e) => updateSize(i, "stock", e.target.value)} className="h-9 rounded-lg text-xs" />
+                      <button onClick={() => removeSize(i)} className="p-1 text-destructive" title="Remove size"><X className="w-4 h-4" /></button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <Button onClick={handleSave} className="w-full h-11 rounded-xl">{editing ? "Update" : "Add Product"}</Button>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
-
-      {showScanner && (
-        <BarcodeScanner 
-          onScan={(scannedBarcode) => {
-            setBarcode(scannedBarcode);
-            setShowScanner(false);
-          }} 
-          onClose={() => setShowScanner(false)} 
-        />
-      )}
     </div>
   );
 };
