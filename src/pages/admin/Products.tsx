@@ -184,17 +184,17 @@ const AdminProducts = () => {
       </div>
 
       <Dialog open={showDialog} onOpenChange={(open) => { if (!open) resetForm(); }}>
-        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto rounded-2xl">
+        <DialogContent className={`max-w-md rounded-2xl ${showScanner ? 'max-h-[500px] p-0' : 'max-h-[90vh] overflow-y-auto'}`}>
           <DialogHeader>
             <DialogTitle>{editing ? "Edit Product" : "Add Product"}</DialogTitle>
           </DialogHeader>
           
           {showScanner ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
+            <div className="space-y-0">
+              <div className="flex items-center justify-between px-6 py-3 border-b">
                 <p className="font-medium">Scan Barcode</p>
                 <button onClick={() => setShowScanner(false)} className="p-2 hover:bg-secondary rounded-xl" title="Close scanner">
-                  <X className="w-4 h-4" />
+                  <X className="w-5 h-5" />
                 </button>
               </div>
               <BarcodeScanner 
