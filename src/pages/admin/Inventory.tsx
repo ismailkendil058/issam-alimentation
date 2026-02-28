@@ -24,12 +24,12 @@ const AdminInventory = () => {
       <h2 className="text-lg font-semibold">المخزون</h2>
 
       <div className="relative">
-        <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <Input
           placeholder="البحث عن المنتجات..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="ps-9 h-11 rounded-xl bg-secondary border-0"
+          className="pl-9 h-11 rounded-xl bg-secondary border-0"
         />
       </div>
 
@@ -37,10 +37,10 @@ const AdminInventory = () => {
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border">
-              <th className="text-right py-3 px-2 text-xs text-muted-foreground uppercase tracking-wider font-medium">المنتج</th>
-              <th className="text-left py-3 px-2 text-xs text-muted-foreground uppercase tracking-wider font-medium">المخزون</th>
-              <th className="text-left py-3 px-2 text-xs text-muted-foreground uppercase tracking-wider font-medium">شراء</th>
-              <th className="text-left py-3 px-2 text-xs text-muted-foreground uppercase tracking-wider font-medium">بيع</th>
+              <th className="text-left py-3 px-2 text-xs text-muted-foreground uppercase tracking-wider font-medium">المنتج</th>
+              <th className="text-right py-3 px-2 text-xs text-muted-foreground uppercase tracking-wider font-medium">المخزون</th>
+              <th className="text-right py-3 px-2 text-xs text-muted-foreground uppercase tracking-wider font-medium">شراء</th>
+              <th className="text-right py-3 px-2 text-xs text-muted-foreground uppercase tracking-wider font-medium">بيع</th>
             </tr>
           </thead>
           <tbody>
@@ -63,13 +63,13 @@ const AdminInventory = () => {
                       </div>
                     )}
                   </td>
-                  <td className="py-3 px-2 text-left tabular-nums">
+                  <td className="py-3 px-2 text-right tabular-nums">
                     {p.quantity_type === "unit" ? p.stock : "—"}
                   </td>
-                  <td className="py-3 px-2 text-left tabular-nums">
+                  <td className="py-3 px-2 text-right tabular-nums">
                     {Number(p.purchase_price).toLocaleString()}
                   </td>
-                  <td className="py-3 px-2 text-left tabular-nums">
+                  <td className="py-3 px-2 text-right tabular-nums">
                     {Number(p.selling_price).toLocaleString()}
                   </td>
                 </tr>
