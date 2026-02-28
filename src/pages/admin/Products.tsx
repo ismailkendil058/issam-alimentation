@@ -141,7 +141,7 @@ const AdminProducts = () => {
     <div className="p-4 space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Products</h2>
-        <Button onClick={() => { resetForm(); setShowDialog(true); }} size="sm" className="rounded-xl gap-1">
+<Button onClick={() => { resetForm(); setShowScanner(true); }} size="sm" className="rounded-xl gap-1">
           <Plus className="w-4 h-4" /> Add
         </Button>
       </div>
@@ -261,6 +261,7 @@ const AdminProducts = () => {
           onScan={(scannedBarcode) => {
             setBarcode(scannedBarcode);
             setShowScanner(false);
+            setShowDialog(true);
           }} 
           onClose={() => setShowScanner(false)} 
         />
