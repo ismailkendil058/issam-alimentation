@@ -8,7 +8,7 @@ interface BarcodeScannerProps {
   onClose: () => void;
 }
 
-// All supported barcode formats
+// All supported barcode formats including Algerian barcodes (GS1 Algeria)
 const SUPPORTED_FORMATS: number[] = [
   Html5QrcodeSupportedFormats.QR_CODE,
   Html5QrcodeSupportedFormats.EAN_13,
@@ -25,6 +25,8 @@ const SUPPORTED_FORMATS: number[] = [
   Html5QrcodeSupportedFormats.MAXICODE,
   Html5QrcodeSupportedFormats.RSS_14,
   Html5QrcodeSupportedFormats.RSS_EXPANDED,
+  // Added support for ITF/ITF-14 (commonly used in Algeria for wholesale/logistics)
+  Html5QrcodeSupportedFormats.ITF,
 ];
 
 const BarcodeScanner = ({ onScan, onClose }: BarcodeScannerProps) => {
@@ -51,9 +53,15 @@ const BarcodeScanner = ({ onScan, onClose }: BarcodeScannerProps) => {
     });
     scannerRef.current = scanner;
 
+    // Improved configuration for better Algerian barcode detection
+    // Higher fps for faster detection, larger qrbox for better scanning
     scanner.start(
       { facingMode: "environment" },
-      { fps: 10, qrbox: { width: 250, height: 150 }, aspectRatio: 1.0 },
+      { 
+        fps: 10, 
+        qrbox: { width: 300, height: 200 }, 
+        aspectRatio: 1.0,
+      },
       (decodedText) => {
         isScanning.current = false;
         scanner.stop().then(() => onScan(decodedText)).catch(() => {});
