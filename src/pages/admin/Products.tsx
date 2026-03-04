@@ -144,7 +144,12 @@ const AdminProducts = () => {
       </div>
 
       <Dialog open={showDialog} onOpenChange={(open) => { setShowDialog(open); if (!open) resetForm(); }}>
-        <DialogContent className="max-w-md rounded-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent
+          className="max-w-md rounded-2xl max-h-[90vh] overflow-y-auto"
+          onInteractOutside={(e) => {
+            if (showScanner) e.preventDefault();
+          }}
+        >
           <DialogHeader>
             <DialogTitle>{editing ? "تعديل المنتج" : "إضافة منتج"}</DialogTitle>
           </DialogHeader>

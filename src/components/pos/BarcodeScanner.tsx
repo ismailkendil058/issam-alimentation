@@ -144,7 +144,7 @@ const BarcodeScanner = ({ onScan, onClose, continuous = false }: BarcodeScannerP
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex md:items-center items-end justify-center md:p-4 pb-0"
+      className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex md:items-center items-end justify-center md:p-4 pb-0 pointer-events-auto"
     >
       <motion.div
         initial={{ y: 50, opacity: 0 }}
