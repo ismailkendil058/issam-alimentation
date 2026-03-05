@@ -173,16 +173,6 @@ const WorkerPOS = () => {
     toast.success("اكتملت عملية البيع!");
   };
 
-  const handleBarcodeScan = (barcode: string) => {
-    const product = products.find((p) => p.barcode === barcode);
-    if (product) {
-      addToCart(product);
-      toast.success(`تمت إضافة ${product.name}`);
-    } else {
-      toast.error("المنتج غير موجود");
-    }
-  };
-
   const filteredProducts = products.filter((p) => {
     const matchesSearch =
       !search ||
@@ -209,7 +199,6 @@ const WorkerPOS = () => {
           <ProductSearch
             search={search}
             onSearchChange={setSearch}
-            onBarcodeScan={handleBarcodeScan}
           />
           <CategoryCarousel
             categories={categories}

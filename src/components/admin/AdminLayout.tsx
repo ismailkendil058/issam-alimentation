@@ -5,7 +5,6 @@ const AdminLayout = () => {
   const links = [
     { to: "/admin", icon: BarChart3, label: "الإحصائيات", end: true },
     { to: "/admin/workers", icon: Users, label: "العمال" },
-    { to: "/admin/categories", icon: Layers, label: "الفئات" },
     { to: "/admin/products", icon: Package, label: "المنتجات" },
     { to: "/admin/inventory", icon: Warehouse, label: "المخزون" },
   ];

@@ -115,15 +115,6 @@ const WorkerLogin = () => {
             </div>
           ))}
         </div>
-
-        <div className="mt-10 text-center">
-          <button
-            onClick={() => navigate("/admin/login")}
-            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-          >
-            دخول المسؤول
-          </button>
-        </div>
       </motion.div>
     </div>
   );
